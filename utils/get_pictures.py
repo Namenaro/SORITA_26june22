@@ -51,3 +51,16 @@ def get_random_pic_of_type(type=None):
     else:
         pics = get_numbers_of_type(type)
     return choice(pics)
+
+def get_omni():
+    ominset = datasets.Omniglot(root='./data_om', download=True, transform=None)
+    return ominset
+
+def get_omni_pics():
+    ominset = get_omni()
+    class_num = 45#15
+    res = []
+    for i in range(len(ominset)):
+        if class_num == ominset[i][1]:
+            res.append(ominset[i][0])
+    return res
