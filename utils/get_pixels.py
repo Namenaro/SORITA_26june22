@@ -17,6 +17,38 @@ def sense(picture, point):
 
     return 0
 
+def coord_allowed(point, XMAX, YMAX):
+    if point.x>=0 and point.x<=XMAX and point.y>=0 and point.y<=YMAX:
+        return True
+    return False
+
+def get_coords_for_q_radius(center_point, radius, XMAX, YMAX)->list:
+    if radius ==0:
+        return [center_point]
+    points = []
+
+    min_x = center_point.x-radius
+    min_y = center_point.y - radius
+
+    max_x=center_point.x-radius
+    max_y = center_point.y - radius
+    #  horizontal
+    for x in range(min_x, max_x):
+        point = Point(x, max_y)
+        if coord_allowed(point, XMAX, YMAX):
+            points.add(point)
+        point = Point(x, min_y)
+        if coord_allowed(point, XMAX, YMAX):
+            points.add(point)
+    #vertical
+    for y in range(min_y+1, max_y-1):
+        point = Point(min_x, y)
+        if coord_allowed(point, XMAX, YMAX):
+            points.add(point)
+        point = Point(max_x, y)
+        if coord_allowed(point, XMAX, YMAX):
+            points.add(point)
+    return points
 
 def get_coords_for_radius(centerx, centery, radius):
     #|x|+|y|=radius ->  |y|=radius-|x|
