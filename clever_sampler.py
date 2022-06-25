@@ -14,6 +14,7 @@ class SimpleConditinalSampler:
         self.run_exp = run_exp
         self.sample = []
         self.actual_p_for_success_of_exp = actual_p_for_success_of_exp
+        self.min_sample_size=46
 
     def check_p_val(self):
         sample_size1 = len(self.sample)
@@ -33,15 +34,18 @@ class SimpleConditinalSampler:
             point = self.sit_finder.get_next_uncheked_situation()
             if point is None:
                 break # кончились ситуации
-            if self.run_condition(point):
-                result = self.run_exp(point)
-                if result is not None:
-                    self.sample.append(result)
-                    current_p_val = self.check_p_val()
-                    if current_p_val <= self.p_value_thresh:
-                        success = True
-                        self.sit_finder.draw()
-                        break # доказали гипотезу!
+
+            result = self.run_exp(point)
+            self.sit_finder.register_res(point, result)
+            if result is not None:
+                self.sample.append(result)
+                if (len(self.sample)) < self.min_sample_size:
+                    continue
+                current_p_val = self.check_p_val()
+                if current_p_val <= self.p_value_thresh:
+                    success = True
+                    self.sit_finder.draw()
+                    break # доказали гипотезу!
         return success, current_p_val, self.sample
 
 
@@ -59,7 +63,11 @@ class SituationFinder:
 
     def _generate_next_batch(self):
         self.current_vicinity_radius+=1
-        self.points_to_check = get_coords_for_q_radius(self.start_point, self.current_vicinity_radius)
+        self.points_to_check = get_coords_for_q_radius(self.start_point,
+                                                       self.current_vicinity_radius,
+                                                       XMAX=self.pic.shape[1],
+                                                       YMAX=self.pic.shape[0])
+        print("generated points: "+ str(len(self.points_to_check)))
 
     def get_next_uncheked_situation(self)->Point:
         if len(self.points_to_check) == 0:
@@ -69,13 +77,18 @@ class SituationFinder:
         return self.points_to_check.pop()
 
     def register_res(self, point, res):
+        self.checked_points.add(point)
         if res is True:
             self.checked_and_sucsessed.add(point)
 
     def draw(self):
         fig, ax = plt.subplots()
         plt.imshow(self.pic, cmap='gray_r')
+
+        for point in self.checked_points:
+            ax.plot(point.x, point.y, marker='o',  markerfacecolor='red', markersize=15, color='red',
+                    linewidth=4)
         for point in self.checked_and_sucsessed:
-            ax.plot(point.x, point.y, marker='o', markerfacecolor='blue', markersize=12, color='skyblue',
+            ax.plot(point.x, point.y, marker='o',  markerfacecolor='green', markersize=12, color='green',
                     linewidth=4)
         plt.show()

@@ -3,15 +3,16 @@ from utils.get_pictures import get_omni_pics
 from utils.point import Point
 from clever_sampler import SimpleConditinalSampler
 import random
+import numpy as np
 
 
 import matplotlib.pyplot as plt
 import numpy as np
 
 pics = get_omni_pics()
-pic = pics[0]
+pic = np.array(pics[0])
 #select_points_on_pic_handly(pic)
-x = np.array(pic).flatten()
+x = pic.flatten()
 
 def get_hist_unnormed(seq) -> dict:
      hist = {}
@@ -58,8 +59,8 @@ def collateral_1A(point):
     return runA(new_point)
 
 def find_start_point(picture, run_exp):
-    Xmax = picture.shape()[1]
-    Ymax = picture.shape()[0]
+    Xmax = picture.shape[1]
+    Ymax = picture.shape[0]
     while True:
         point = Point(random.randrange(Xmax), random.randrange(Ymax))
         if run_exp(point):

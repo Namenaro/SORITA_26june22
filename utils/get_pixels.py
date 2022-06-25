@@ -30,24 +30,24 @@ def get_coords_for_q_radius(center_point, radius, XMAX, YMAX)->list:
     min_x = center_point.x-radius
     min_y = center_point.y - radius
 
-    max_x=center_point.x-radius
-    max_y = center_point.y - radius
+    max_x=center_point.x+radius
+    max_y = center_point.y + radius
     #  horizontal
     for x in range(min_x, max_x):
         point = Point(x, max_y)
         if coord_allowed(point, XMAX, YMAX):
-            points.add(point)
+            points.append(point)
         point = Point(x, min_y)
         if coord_allowed(point, XMAX, YMAX):
-            points.add(point)
+            points.append(point)
     #vertical
     for y in range(min_y+1, max_y-1):
         point = Point(min_x, y)
         if coord_allowed(point, XMAX, YMAX):
-            points.add(point)
+            points.append(point)
         point = Point(max_x, y)
         if coord_allowed(point, XMAX, YMAX):
-            points.add(point)
+            points.append(point)
     return points
 
 def get_coords_for_radius(centerx, centery, radius):
