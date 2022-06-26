@@ -18,18 +18,20 @@ def test_MV():
     fig, ax = plt.subplots()
     X=[]
     Y=[]
-    p1 = 0.2
+    p1 = 0.9
     p2 = 0.1
     for i in range(1,100):
         sample1 = get_binary_sample(sample_len=i, p_one=p1)
-        sample2 = get_binary_sample(sample_len=i, p_one=p2)
+        sample2 = get_binary_sample(sample_len=i, p_one=p2) #np.array([0,0,0]) #
         ttest, pval = stats.mannwhitneyu(sample1, sample2, use_continuity=False, alternative="two-sided")
+        print (pval)
         X.append(i)
         Y.append(pval)
     ax.plot(X, Y, marker='o', markerfacecolor='blue', markersize=10, color='skyblue', linewidth=4)
     ax.set_title("Поведение критерия Манна-Уитни, разница между монетами " + str(abs(p2-p1)))
     ax.set_xlabel("размер выборки (каждой из двух) ")
-    ax.set_ylabel("p-значение критерия Манна_Уитни ")
+    ax.set_ylabel("p-значение критерия Манна-Уитни ")
+    ax.set_ylim([-0.1, 1.1])
     plt.show()
 
 
