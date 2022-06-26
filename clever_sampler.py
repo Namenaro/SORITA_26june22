@@ -14,7 +14,7 @@ class SimpleConditinalSampler:
         self.run_exp = run_exp
         self.sample = []
         self.actual_p_for_success_of_exp = actual_p_for_success_of_exp
-        self.min_sample_size=46
+        self.min_sample_size=1
 
     def check_p_val(self):
         sample_size1 = len(self.sample)

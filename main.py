@@ -22,7 +22,7 @@ def get_hist_unnormed(seq) -> dict:
 
 def get_hist_normed(seq)-> dict:
     hist= get_hist_unnormed(seq)
-    num_elements =0
+    num_elements = 0
     for key in hist.keys():
         num_elements+=hist[key]
     for key in hist.keys():
