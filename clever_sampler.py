@@ -70,11 +70,14 @@ class SituationFinder:
         print("generated points: "+ str(len(self.points_to_check)))
 
     def get_next_uncheked_situation(self)->Point:
-        if len(self.points_to_check) == 0:
-            self._generate_next_batch()
-        if len(self.points_to_check)==0:
-            return None
-        return self.points_to_check.pop()
+        while True:
+            if len(self.points_to_check) == 0:
+                self._generate_next_batch()
+            if len(self.points_to_check)==0:
+                return None
+            candidate = self.points_to_check.pop()
+            if self.run_condition(candidate):
+                return candidate
 
     def register_res(self, point, res):
         self.checked_points.add(point)

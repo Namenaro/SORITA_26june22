@@ -1,4 +1,6 @@
 from utils.point import Point
+from utils.plot_on_pic import plot_points_array
+from utils.get_pictures import get_omni_pics
 
 import random
 import numpy as np
@@ -33,7 +35,7 @@ def get_coords_for_q_radius(center_point, radius, XMAX, YMAX)->list:
     max_x=center_point.x+radius
     max_y = center_point.y + radius
     #  horizontal
-    for x in range(min_x, max_x):
+    for x in range(min_x, max_x+1):
         point = Point(x, max_y)
         if coord_allowed(point, XMAX, YMAX):
             points.append(point)
@@ -41,7 +43,7 @@ def get_coords_for_q_radius(center_point, radius, XMAX, YMAX)->list:
         if coord_allowed(point, XMAX, YMAX):
             points.append(point)
     #vertical
-    for y in range(min_y+1, max_y-1):
+    for y in range(min_y+1, max_y):
         point = Point(min_x, y)
         if coord_allowed(point, XMAX, YMAX):
             points.append(point)
@@ -49,6 +51,13 @@ def get_coords_for_q_radius(center_point, radius, XMAX, YMAX)->list:
         if coord_allowed(point, XMAX, YMAX):
             points.append(point)
     return points
+
+def test_gen_vicinity():
+    pics = get_omni_pics()
+    pic = np.array(pics[0])
+    points = get_coords_for_q_radius(center_point=Point(50,50), radius=1, XMAX=pic.shape[1], YMAX=pic.shape[0])
+    plot_points_array(points, pic, marker=None)
+    plt.show()
 
 def get_coords_for_radius(centerx, centery, radius):
     #|x|+|y|=radius ->  |y|=radius-|x|
@@ -164,3 +173,6 @@ def get_point_handly(pic):
     X,Y = select_points_on_pic_handly(pic, keys=None)
     return Point(X[0],Y[0])
 
+
+if __name__ == "__main__":
+    test_gen_vicinity()
