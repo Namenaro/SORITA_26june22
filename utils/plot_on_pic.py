@@ -21,3 +21,7 @@ def plot_points_array(ps, pic, marker=None):
     for point in ps:
         ax.plot(point.x, point.y, marker=marker, markerfacecolor='blue', markersize=12, color='skyblue', linewidth=4)
     return fig
+
+
+if __name__ == "__main__":
+    pass

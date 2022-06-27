@@ -1,7 +1,8 @@
 from utils.get_pixels import select_points_on_pic_handly
 from utils.get_pictures import get_omni_pics
 from utils.point import Point
-from clever_sampler import SimpleConditinalSampler
+from proofer_by_sampler import Proofer
+from situation_finder import SituationFinderInVicinity, SituationFinderRandom
 import random
 import numpy as np
 
@@ -72,9 +73,11 @@ def check_possible_collateral():
     run_condition =runA
     run_exp = collateral_1A
     actual_p_for_success_of_exp=0.07356009070294785
-    start_point=find_start_point(pic, run_condition)
-    sampler = SimpleConditinalSampler(pic, run_condition, run_exp, actual_p_for_success_of_exp, start_point)
-    success, p_val, sample= sampler.try_sample()
+    start_point = find_start_point(pic, run_condition)
+    #sit_finder = SituationFinderInVicinity(pic, start_point, run_condition)
+    sit_finder = SituationFinderRandom(pic, run_condition)
+    proofer = Proofer(pic,  run_exp, actual_p_for_success_of_exp, sit_finder, max_attempts=20)
+    success, p_val, sample= proofer.try_sample()
     print ("cheked: " + str(success) + ', p_val = '+ str(p_val)+ ", sanmple size=" + str(len(sample)))
 
 def start_info():
