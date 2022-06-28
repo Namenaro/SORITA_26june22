@@ -9,7 +9,7 @@ class PredictionSampler:
         self.sample = []
 
 
-    def fill_sample(self, attemts=20):
+    def fill_sample(self, attemts):
         for _ in range(attemts):
             point = self.sit_finder.get_next_uncheked_situation()
             outcome = self.run_collateral(point)
@@ -47,7 +47,11 @@ class PredictionSampler:
 
     def get_p_of_one(self):
         hist = self.get_hist_normed()
-        return hist[True]
+        return hist.get(True, 0)
+
+    def get_num_ones(self):
+        hist = self.get_hist_unnormed()
+        return hist.get(True, 0)
 
 
 
