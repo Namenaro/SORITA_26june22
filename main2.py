@@ -7,6 +7,7 @@ from prediction_sampler import *
 from stat_hypo import *
 from current_utils import *
 from base_predictor import *
+from derived_predictor import *
 
 import random
 import matplotlib.pyplot as plt
@@ -22,6 +23,14 @@ def empty_run(point):
 def runA(point):
     return sense_0(point, pic)
 
+def runA_right_NotA(point):
+    dpoint = Point(1,0)
+    if runA(point):
+        new_point=Point(point.x+dpoint.x, point.y+dpoint.y)
+        if runA(new_point) is False:
+            return True
+    return False
+
 sit_finder = SituationFinderRandom(pic, empty_run)
 pred_sampler = PredictionSampler(pic, runA, sit_finder)
 pred_sampler.fill_sample(350)
@@ -36,9 +45,16 @@ print ("p_of_one = " + str(p_of_one))
 # предсказания.
 
 predictor = BasePredictor(pic, runA)
-predictor.fill_predictions(runA, radius=7, trivial_p_one =p_of_one, sample_len=30)
-predictor.show_hard_predictions(threshold=0.9)
-predictor.show_predictions3()
+predictor.fill_predictions(runA, radius=7, trivial_p_one =p_of_one, sample_len=160)
+#predictor.show_hard_predictions(threshold=0.9)
+#predictor.show_predictions3()
 predictor.show_predictions1()
-predictor.show_predictions2()
+#predictor.show_predictions2()
+predictor.show_prediction4()
+
+# ШАГ 3. Глянем какие выживут предсказания при добавлении факта, что справа случилось неА
+new_run_condition = runA_right_NotA
+dp = DerivedPredictor(pic, new_run_condition, predictor.predictions)
+dp.check_old_predictions(sample_len=5)
+dp.show_corrections()
 

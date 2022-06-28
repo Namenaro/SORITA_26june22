@@ -38,6 +38,7 @@ class BasePredictor:
         self.name='A'
         self.predictions = []
         self.pic=pic
+        self.p_val_threshold=0.00001
 
     def fill_predictions(self, run_exp,radius,trivial_p_one, sample_len):
         for i in range(-radius, radius+1):
@@ -55,6 +56,8 @@ class BasePredictor:
                              p_val=get_p_value_for_paramentric_case(num_ones, len(pred_sampler.sample), trivial_p_one),
                              p_abs_diff=abs(trivial_p_one-new_p_of_one),
                              simple_exp=se)
+                if p.p_val<self.p_val_threshold:
+                    p.proved_non_trivial=True
                 self.predictions.append(p)
 
 
@@ -68,11 +71,11 @@ class BasePredictor:
             ax.plot(new_point.x, new_point.y, marker='o', markerfacecolor='red', color='red',
                     linewidth=4)
 
-            if prediction.p_val < 0.00001:
+            if prediction.proved_non_trivial:
                 colorname = 'green'
                 ax.plot(new_point.x, new_point.y, marker='o', markerfacecolor=colorname, color=colorname,
                         linewidth=4)
-        ax.plot(point.x, point.y, marker='s', markerfacecolor='blue', color='blue')
+        ax.plot(point.x, point.y, marker='s', markerfacecolor='blue', color='blue', alpha=0.3)
         plt.show()
 
 
@@ -85,7 +88,7 @@ class BasePredictor:
 
         for prediction in self.predictions:
             new_point = Point(point.x + prediction.exp.dpoint.x, point.y + prediction.exp.dpoint.y)
-            if prediction.p_val < 0.00001:
+            if prediction.proved_non_trivial:
                 val=prediction.power
                 str_marker='$'+str(val)+'$'
                 c= cm(norm(val))
@@ -94,7 +97,7 @@ class BasePredictor:
         sm = plt.cm.ScalarMappable(cmap=cm, norm=norm)
         ax.set_title("насколько это низкоэнтропийное предказание power=max(p_of_one, 1-p_of_one)")
         sm.set_array([])
-        ax.plot(point.x, point.y, marker='s', markerfacecolor='blue', color='blue')
+        ax.plot(point.x, point.y, marker='s', markerfacecolor='blue', color='blue', alpha=0.3)
         plt.colorbar(sm)
         plt.show()
 
@@ -108,18 +111,44 @@ class BasePredictor:
 
         for prediction in self.predictions:
             new_point = Point(point.x + prediction.exp.dpoint.x, point.y + prediction.exp.dpoint.y)
-            if prediction.p_val < 0.00001:
+            if prediction.proved_non_trivial:
                 val=prediction.p_abs_diff
                 str_marker='$'+str(val)+'$'
                 c= cm(norm(val))
                 ax.plot(new_point.x, new_point.y, marker='s', markerfacecolor=c, color=c, linewidth=4)
                 #ax.plot(new_point.x, new_point.y, marker=str_marker, markerfacecolor=c, color=c, linewidth=4, markersize=15)
-        ax.plot(point.x, point.y, marker='s', markerfacecolor='blue', color='blue')
+        ax.plot(point.x, point.y, marker='s', markerfacecolor='blue', color='blue', alpha=0.3)
         sm = plt.cm.ScalarMappable(cmap=cm, norm=norm)
         ax.set_title("разница по вероятности от того предсказания, которое исправляется этим предсказанием")
         sm.set_array([])
-        ax.plot(point.x, point.y, marker='s', markerfacecolor='blue', color='blue')
         plt.colorbar(sm)
+        plt.show()
+
+    def show_prediction4(self):
+        # какой исход более вероятный?
+        fig, ax = plt.subplots()
+        plt.imshow(self.pic, cmap='gray_r')
+        point = find_start_point(self.pic, self.run_condition)
+        cm_one=plt.get_cmap('Reds')
+        cm_not_one=plt.get_cmap('Greens')
+        norm = mpl.colors.Normalize(vmin=0, vmax=1)
+
+        for prediction in self.predictions:
+            new_point = Point(point.x + prediction.exp.dpoint.x, point.y + prediction.exp.dpoint.y)
+            if prediction.proved_non_trivial:
+                val = prediction.p_of_one
+                if val>0.5:
+                    # значит предсказываем 1
+                    c= cm_one(norm(val))
+                    ax.plot(new_point.x, new_point.y, marker='s', markerfacecolor=c, color=c, linewidth=4)
+                else:
+                    c = cm_not_one(norm(val))
+                    ax.plot(new_point.x, new_point.y, marker='s', markerfacecolor=c, color=c, linewidth=4)
+        ax.plot(point.x, point.y, marker='s', markerfacecolor='blue', color='blue', alpha=0.3)
+
+        ax.set_title("расным - предсказывается один, зеленым не один")
+
+        plt.colorbar()
         plt.show()
 
     def show_hard_predictions(self, threshold):
@@ -131,7 +160,7 @@ class BasePredictor:
         counter = 0
         for prediction in self.predictions:
             new_point = Point(point.x + prediction.exp.dpoint.x, point.y + prediction.exp.dpoint.y)
-            if prediction.p_val < 0.00001:
+            if prediction.proved_non_trivial:
                 val = prediction.power
                 str_marker = '$' + str(val) + '$'
                 c = cm(norm(val))
@@ -141,8 +170,8 @@ class BasePredictor:
                 ax.plot(new_point.x, new_point.y, marker='s', markerfacecolor=c, color=c, linewidth=4)
                 # ax.plot(new_point.x, new_point.y, marker=str_marker, markerfacecolor=c, color=c, linewidth=4, markersize=15)
         sm = plt.cm.ScalarMappable(cmap=cm, norm=norm)
-        ax.plot(point.x, point.y, marker='s', markerfacecolor='blue', color='blue')
-        ax.set_title("разница по вероятности от того предсказания, которое исправляется этим предсказанием")
+        ax.plot(point.x, point.y, marker='s', markerfacecolor='blue', color='blue', alpha=0.3)
+        ax.set_title("жесткие предсказания, порог "+ str(threshold))
         sm.set_array([])
         plt.colorbar(sm)
         plt.show()
